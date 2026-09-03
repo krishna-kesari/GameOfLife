@@ -16,7 +16,27 @@ def count_neighbors(grid, row, col):
     alive_count = 0
     
     # TODO: Implement your neighbor-counting logic here!
+    
+    #Count the number of alive neighbors surrounding cell (row, col).
+    #Checks all 8 directions. Skips cells outside the grid boundary.
+    
+    rows = len(grid)
+    cols = len(grid[0])
+    
 
+    for dr in [-1, 0, 1]:
+        for dc in [-1, 0, 1]:
+            if dr == 0 and dc == 0:
+                continue          # skip the cell itself
+
+            r = row + dr
+            c = col + dc
+
+            if 0 <= r < rows and 0 <= c < cols:   # stay inside the grid
+                if grid[r][c] == 1:
+                   alive_count += 1
+
+    
     return alive_count
 
 #---------------------------- TASK 2 ----------------------------
@@ -43,7 +63,25 @@ def compute_next_generation(grid):
     next_grid = [[0 for _ in range(cols)] for _ in range(rows)]
     
     # TODO: Iterate through every cell in the `grid`.
-    # TODO: Use your `count_neighbors` function to find out how many neighbors it has.
-    # TODO: Apply the 4 Rules of Life to determine if it should be 1 (alive) or 0 (dead) in `next_grid`.
+
+
+    # Build a fresh grid and never modify the original mid-step
+    next_grid = [[0] * cols for _ in range(rows)]
+
+    for r in range(rows):
+        for c in range(cols):
+            neighbors = count_neighbors(grid, r, c)
+            alive = grid[r][c] == 1
+
+            if alive:
+                # Rule 1  Underpopulation: fewer than 2 neighbours then dies
+                # Rule 3  Overpopulation: more than 3 neighbours then dies
+                # Rule 2  Survival: 2 or 3 neighbours → lives on
+                next_grid[r][c] = 1 if neighbors in (2, 3) else 0
+            else:
+                # Rule 4  Reproduction: exactly 3 neighbours then becomes alive
+                next_grid[r][c] = 1 if neighbors == 3 else 0
+
+
 
     return next_grid
